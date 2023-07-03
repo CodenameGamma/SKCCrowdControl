@@ -6,25 +6,30 @@ extern "C"
 	bool shutdown = false;
 	ccpp crowdcontrol;
 
-	bool Ring()
+	bool Ring(int thing)
 	{
 		printf("DidRing!");
 		return false;
+	}
+	bool RegisterFunctions()
+	{
+        crowdcontrol.register_trigger("ring", []() {
+            printf("Effect Ring\n");
+            if (Ring(1))
+                return ccpp::status_t::success;
+
+            else
+                return ccpp::status_t::retry;
+            });
+			return true;
 	}
 	int CCWait = 0;
 	bool CCInitDone = false;
 	__declspec(dllexport) void Init(const char* path, const HelperFunctions& helperFunctions)
 	{
 		printf("Registering Funcs\n");
-		crowdcontrol.register_trigger("ring", []() {
-			printf("Effect Ring\n");
-			if (true)
-				return ccpp::status_t::success;
-
-			else
-				return ccpp::status_t::retry;
-			});
-
+		RegisterFunctions();
+		printf("Registeration finished\n");
 
 		if (CCWait < 600 && CCInitDone == false) {
 			CCWait++;
@@ -34,7 +39,9 @@ extern "C"
 				crowdcontrol.initialize(true);
 			}
 		}
+		printf("Doing Init\n");
 		crowdcontrol.initialize(true);
+		printf("Init Finished. \n");
 		//crowdcontrol.update();
 	}
 
