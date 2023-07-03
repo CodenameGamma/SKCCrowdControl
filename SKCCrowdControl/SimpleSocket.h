@@ -42,6 +42,7 @@
  *----------------------------------------------------------------------------*/
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <sys/stat.h>
 #include <stdlib.h>
