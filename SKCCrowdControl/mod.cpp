@@ -11,38 +11,34 @@ extern "C"
 		printf("DidRing!");
 		return false;
 	}
+
+	ccpp::status_t test_effect()
+	{
+		return ccpp::status_t::success;
+	}
+
 	bool RegisterFunctions()
 	{
-        crowdcontrol.register_trigger("ring", []() {
-            printf("Effect Ring\n");
-            if (Ring(1))
-                return ccpp::status_t::success;
+		crowdcontrol.register_trigger("ring", []()
+		{
+			std::printf("\n\n\nRing\n\n\n");
+			return ccpp::status_t::success;
+		});
 
-            else
-                return ccpp::status_t::retry;
-            });
-			return true;
+		return true;
 	}
-	int CCWait = 0;
-	bool CCInitDone = false;
+
+	__declspec(dllexport) void OnFrame(const char* path, const HelperFunctions& helperFunctions)
+	{
+		crowdcontrol.update();
+	};
+
 	__declspec(dllexport) void Init(const char* path, const HelperFunctions& helperFunctions)
 	{
-		printf("Registering Funcs\n");
-		RegisterFunctions();
-		printf("Registeration finished\n");
-
-		if (CCWait < 600 && CCInitDone == false) {
-			CCWait++;
-			if (CCWait == 599) {
-				CCInitDone = true;
-				printf("init-finsiehd \n");
-				crowdcontrol.initialize(true);
-			}
+		if (crowdcontrol.initialize_ex("127.0.0.1", 58430, false))
+		{
+			RegisterFunctions();
 		}
-		printf("Doing Init\n");
-		crowdcontrol.initialize(true);
-		printf("Init Finished. \n");
-		//crowdcontrol.update();
 	}
 
 	__declspec(dllexport) ModInfo SKCModInfo = { ModLoaderVer };

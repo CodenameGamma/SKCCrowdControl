@@ -61,7 +61,7 @@ public:
 	//Tells the library to shutdown and cleanup
 	bool shutdown = false;
 	//The CrowdControl effect codes that are sent to the net socket and their callback
-	std::unordered_map<std::string, std::function<ccpp::status_t()>> triggers;
+	static std::unordered_map<std::string, std::function<ccpp::status_t()>> triggers;
 	//Typical string VA
 	static std::string va(const char* fmt, ...)
 	{

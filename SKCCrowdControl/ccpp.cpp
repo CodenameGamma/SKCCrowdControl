@@ -5,6 +5,7 @@
 
 //The tcp socket
 static CActiveSocket sock{};
+std::unordered_map<std::string, std::function<ccpp::status_t()>> ccpp::triggers = {};
 
 bool ccpp::initialize_ex(const char* ip, std::uint16_t port, bool threaded)
 {
@@ -87,13 +88,13 @@ void ccpp::check_socket()
 			std::string id = json["id"].dump();
 
 			//Check if effect has been registered
-			if (this->triggers[code] != 0)
+			if (ccpp::triggers[code] != 0)
 			{
 				ccpp::effect_t data;
 				data.viewer = viewer.c_str();
 
 				//If it has been registered, then run the callback
-				auto status_code = this->triggers[code]();
+				auto status_code = ccpp::triggers[code]();
 				//Send the backend the status code with the id
 				std::string status = va("{\"id\":%s,\"status\":%i}", id.c_str(), (int)status_code);
 
@@ -146,5 +147,11 @@ void ccpp::threaded_update()
 
 void ccpp::register_trigger(const std::string& key, std::function<ccpp::status_t()> callback)
 {
-	this->triggers.insert({key, callback});
+	if (callback == nullptr)
+	{
+		print_error("Callback for effect \"%s\" was nullptr!", key.c_str());
+		return;
+	}
+
+	ccpp::triggers.insert({ key, callback });
 }
